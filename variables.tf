@@ -53,11 +53,13 @@ locals {
 variable "vpc_id" {
   description = "The ID of the VPC (Virtual Private Cloud) where the security group will be created. This is a required field to associate the security group with a specific VPC."
   type        = string
+  default     = null
 }
 
 variable "name" {
   description = "The name of the security group. This is required if `create_sg` is true. If `create_sg` is false, the security group won't be created, and this value is ignored."
   type        = string
+  default     = null
 }
 
 variable "description" {
