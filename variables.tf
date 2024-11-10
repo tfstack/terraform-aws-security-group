@@ -98,8 +98,8 @@ A list of ingress rules that define allowed inbound traffic to the security grou
 EOT
 
   type = list(object({
-    from_port                    = number                      # Starting port for the rule
-    to_port                      = number                      # Ending port for the rule
+    from_port                    = optional(number, null)      # Starting port for the rule
+    to_port                      = optional(number, null)      # Ending port for the rule
     ip_protocol                  = string                      # Protocol (e.g., "tcp", "udp")
     cidr_ipv4                    = optional(string, null)      # Source IPv4 CIDR
     cidr_ipv6                    = optional(string, null)      # Source IPv6 CIDR
@@ -118,8 +118,8 @@ A list of egress rules that define allowed outbound traffic from the security gr
 EOT
 
   type = list(object({
-    from_port                    = number                      # Starting port for the rule
-    to_port                      = number                      # Ending port for the rule
+    from_port                    = optional(number, null)      # Starting port for the rule
+    to_port                      = optional(number, null)      # Ending port for the rule
     ip_protocol                  = string                      # Protocol (e.g., "tcp", "udp")
     cidr_ipv4                    = optional(string, null)      # Destination IPv4 CIDR
     cidr_ipv6                    = optional(string, null)      # Destination IPv6 CIDR
