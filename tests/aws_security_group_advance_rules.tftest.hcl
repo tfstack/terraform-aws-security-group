@@ -25,8 +25,6 @@ run "create_security_group_advance" {
     ]
     advance_egress_rules = [
       {
-        from_port   = 0
-        to_port     = 0
         ip_protocol = "-1"
         cidr_ipv4   = "0.0.0.0/0"
         description = "Allow all outbound traffic"
@@ -88,12 +86,12 @@ run "create_security_group_advance" {
     error_message = "Security group has no outbound rules configured"
   }
 
-  # Assert that the security group allows egress traffic on port 0.
+  # Assert that the security group allows all egress traffic.
   assert {
     condition = anytrue([
       for rule in aws_vpc_security_group_egress_rule.advance :
-      rule.from_port == 0 && rule.to_port == 0 && rule.ip_protocol == "-1"
+      rule.ip_protocol == "-1"
     ])
-    error_message = "Security group does not have the expected egress rule on port 0"
+    error_message = "Security group does not have the expected egress rule that allows all traffic"
   }
 }

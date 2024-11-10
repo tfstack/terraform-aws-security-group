@@ -54,8 +54,6 @@ module "security_group_rdspsqlserver" {
 
   advance_egress_rules = [
     {
-      from_port   = 0
-      to_port     = 0
       ip_protocol = "-1"
       cidr_ipv4   = "0.0.0.0/0"
       description = "Allow all outbound traffic"
