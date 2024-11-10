@@ -53,13 +53,11 @@ locals {
 variable "vpc_id" {
   description = "The ID of the VPC (Virtual Private Cloud) where the security group will be created. This is a required field to associate the security group with a specific VPC."
   type        = string
-  default     = null
 }
 
 variable "name" {
   description = "The name of the security group. This is required if `create_sg` is true. If `create_sg` is false, the security group won't be created, and this value is ignored."
   type        = string
-  default     = null
 }
 
 variable "description" {
@@ -93,48 +91,94 @@ variable "delete_timeout" {
 }
 
 variable "advance_ingress_rules" {
-  description = "A list of ingress rules to define allowed inbound traffic to the security group. Each rule specifies the source IP, ports, and protocols allowed. Defaults to an empty list if not specified."
+  description = <<EOT
+A list of ingress rules that define allowed inbound traffic to the security group. Each rule can specify:
+
+- from_port: Starting port for traffic (number, required)
+- to_port: Ending port for traffic (number, required)
+- ip_protocol: Protocol type (string, required, e.g., "tcp", "udp", "-1" for all)
+- cidr_ipv4: Source IPv4 CIDR block (optional, e.g., "0.0.0.0/0")
+- cidr_ipv6: Source IPv6 CIDR block (optional, e.g., "::/0")
+- description: A description for the rule (optional, string)
+- prefix_list_id: AWS prefix list ID for managed lists (optional, string)
+- referenced_security_group_id: ID of another security group to allow traffic from (optional, string)
+- tags: Key-value map of tags to apply to the rule (optional, map of strings)
+
+Defaults to an empty list if no ingress rules are provided.
+EOT
+
   type = list(object({
-    from_port                    = number
-    to_port                      = number
-    ip_protocol                  = string
-    cidr_ipv4                    = optional(string, null)
-    cidr_ipv6                    = optional(string, null)
-    description                  = optional(string, null)
-    prefix_list_id               = optional(string, null)
-    referenced_security_group_id = optional(string, null)
-    tags                         = optional(map(string), null)
+    from_port                    = number                      # Starting port for the rule
+    to_port                      = number                      # Ending port for the rule
+    ip_protocol                  = string                      # Protocol (e.g., "tcp", "udp")
+    cidr_ipv4                    = optional(string, null)      # Source IPv4 CIDR
+    cidr_ipv6                    = optional(string, null)      # Source IPv6 CIDR
+    description                  = optional(string, null)      # Rule description
+    prefix_list_id               = optional(string, null)      # AWS prefix list ID
+    referenced_security_group_id = optional(string, null)      # Referenced security group ID
+    tags                         = optional(map(string), null) # Tags for the rule
   }))
+
   default = []
 }
 
 variable "advance_egress_rules" {
-  description = "A list of egress rules to define allowed outbound traffic from the security group. Each rule specifies the destination IP, ports, and protocols allowed. Defaults to an empty list if not specified."
+  description = <<EOT
+A list of egress rules that define allowed outbound traffic from the security group. Each rule can specify:
+
+- from_port: Starting port for traffic (number, required)
+- to_port: Ending port for traffic (number, required)
+- ip_protocol: Protocol type (string, required, e.g., "tcp", "udp", "-1" for all)
+- cidr_ipv4: Destination IPv4 CIDR block (optional, e.g., "0.0.0.0/0")
+- cidr_ipv6: Destination IPv6 CIDR block (optional, e.g., "::/0")
+- description: A description for the rule (optional, string)
+- prefix_list_id: AWS prefix list ID for managed lists (optional, string)
+- referenced_security_group_id: ID of another security group to allow traffic to (optional, string)
+- tags: Key-value map of tags to apply to the rule (optional, map of strings)
+
+Defaults to an empty list if no egress rules are provided.
+EOT
+
   type = list(object({
-    from_port                    = number
-    to_port                      = number
-    ip_protocol                  = string
-    cidr_ipv4                    = optional(string, null)
-    cidr_ipv6                    = optional(string, null)
-    description                  = optional(string, null)
-    prefix_list_id               = optional(string, null)
-    referenced_security_group_id = optional(string, null)
-    tags                         = optional(map(string), null)
+    from_port                    = number                      # Starting port for the rule
+    to_port                      = number                      # Ending port for the rule
+    ip_protocol                  = string                      # Protocol (e.g., "tcp", "udp")
+    cidr_ipv4                    = optional(string, null)      # Destination IPv4 CIDR
+    cidr_ipv6                    = optional(string, null)      # Destination IPv6 CIDR
+    description                  = optional(string, null)      # Rule description
+    prefix_list_id               = optional(string, null)      # AWS prefix list ID
+    referenced_security_group_id = optional(string, null)      # Referenced security group ID
+    tags                         = optional(map(string), null) # Tags for the rule
   }))
+
   default = []
 }
 
 variable "custom_ingress_rules" {
-  description = "A list of ingress rules to define allowed inbound traffic to the security group."
+  description = <<EOT
+A list of custom ingress rules defining allowed inbound traffic to the security group. Each rule includes:
+
+- rule_name: A predefined name representing the rule (string, required).
+- cidr_ipv4: IPv4 CIDR block for source traffic (optional, string).
+- cidr_ipv6: IPv6 CIDR block for source traffic (optional, string).
+- description: A description of the rule (optional, string).
+- prefix_list_id: AWS prefix list ID for managed IP ranges (optional, string).
+- referenced_security_group_id: ID of a security group to allow traffic from (optional, string).
+- tags: Key-value pairs for tagging (optional, map of strings).
+
+All `rule_name` values in custom_ingress_rules must match a predefined rule in the `rule_names` map. Defaults to an empty list if no ingress rules are provided.
+EOT
+
   type = list(object({
-    rule_name                    = string
-    cidr_ipv4                    = optional(string, null)
-    cidr_ipv6                    = optional(string, null)
-    description                  = optional(string, null)
-    prefix_list_id               = optional(string, null)
-    referenced_security_group_id = optional(string, null)
-    tags                         = optional(map(string), null)
+    rule_name                    = string                      # Name of the rule, must match predefined rule names
+    cidr_ipv4                    = optional(string, null)      # Source IPv4 CIDR
+    cidr_ipv6                    = optional(string, null)      # Source IPv6 CIDR
+    description                  = optional(string, null)      # Description of the rule
+    prefix_list_id               = optional(string, null)      # AWS prefix list ID
+    referenced_security_group_id = optional(string, null)      # Referenced security group ID
+    tags                         = optional(map(string), null) # Tags for the rule
   }))
+
   default = []
 
   validation {
@@ -144,16 +188,30 @@ variable "custom_ingress_rules" {
 }
 
 variable "custom_egress_rules" {
-  description = "A list of ingress rules to define allowed outbound traffic to the security group."
+  description = <<EOT
+A list of custom egress rules defining allowed outbound traffic from the security group. Each rule includes:
+
+- rule_name: A predefined name representing the rule (string, required).
+- cidr_ipv4: IPv4 CIDR block for destination traffic (optional, string).
+- cidr_ipv6: IPv6 CIDR block for destination traffic (optional, string).
+- description: A description of the rule (optional, string).
+- prefix_list_id: AWS prefix list ID for managed IP ranges (optional, string).
+- referenced_security_group_id: ID of a security group to allow traffic to (optional, string).
+- tags: Key-value pairs for tagging (optional, map of strings).
+
+All `rule_name` values in custom_egress_rules must match a predefined rule in the `rule_names` map. Defaults to an empty list if no egress rules are provided.
+EOT
+
   type = list(object({
-    rule_name                    = string
-    cidr_ipv4                    = optional(string, null)
-    cidr_ipv6                    = optional(string, null)
-    description                  = optional(string, null)
-    prefix_list_id               = optional(string, null)
-    referenced_security_group_id = optional(string, null)
-    tags                         = optional(map(string), null)
+    rule_name                    = string                      # Name of the rule, must match predefined rule names
+    cidr_ipv4                    = optional(string, null)      # Destination IPv4 CIDR
+    cidr_ipv6                    = optional(string, null)      # Destination IPv6 CIDR
+    description                  = optional(string, null)      # Description of the rule
+    prefix_list_id               = optional(string, null)      # AWS prefix list ID
+    referenced_security_group_id = optional(string, null)      # Referenced security group ID
+    tags                         = optional(map(string), null) # Tags for the rule
   }))
+
   default = []
 
   validation {
@@ -163,31 +221,61 @@ variable "custom_egress_rules" {
 }
 
 variable "inline_ingress_rules" {
-  description = "A list of inline ingress rules to define allowed inbound traffic to the security group. Each rule specifies the source IP, ports, and protocols allowed. Defaults to an empty list if not specified."
+  description = <<EOT
+A list of inline ingress rules that define allowed inbound traffic to the security group. Each rule includes:
+
+- from_port: Starting port of the allowed traffic range (number, required).
+- to_port: Ending port of the allowed traffic range (number, required).
+- protocol: Protocol to allow (e.g., "tcp", "udp") (string, required).
+- cidr_blocks: IPv4 CIDR blocks allowed for the rule (optional, list of strings).
+- ipv6_cidr_blocks: IPv6 CIDR blocks allowed for the rule (optional, list of strings).
+- prefix_list_ids: List of AWS-managed prefix list IDs for allowed IP ranges (optional, list of strings).
+- security_groups: List of security group IDs to allow traffic from (optional, list of strings).
+- description: Description of the rule (optional, string).
+
+Defaults to an empty list if no inline ingress rules are provided.
+EOT
+
   type = list(object({
-    from_port        = number
-    to_port          = number
-    protocol         = string
-    cidr_blocks      = optional(list(string), null)
-    ipv6_cidr_blocks = optional(list(string), null)
-    prefix_list_ids  = optional(list(string), null)
-    security_groups  = optional(list(string), null)
-    description      = optional(string, null)
+    from_port        = number                       # Starting port for allowed traffic
+    to_port          = number                       # Ending port for allowed traffic
+    protocol         = string                       # Protocol (e.g., "tcp" or "udp")
+    cidr_blocks      = optional(list(string), null) # IPv4 CIDR blocks
+    ipv6_cidr_blocks = optional(list(string), null) # IPv6 CIDR blocks
+    prefix_list_ids  = optional(list(string), null) # AWS prefix list IDs for IP ranges
+    security_groups  = optional(list(string), null) # Security group IDs for source security groups
+    description      = optional(string, null)       # Description of the rule
   }))
+
   default = []
 }
 
 variable "inline_egress_rules" {
-  description = "A list of inline egress rules to define allowed outbound traffic from the security group. Each rule specifies the destination IP, ports, and protocols. Defaults to an empty list if not specified."
+  description = <<EOT
+A list of inline egress rules defining allowed outbound traffic from the security group. Each rule includes:
+
+- from_port: The starting port of the allowed traffic range (number, required).
+- to_port: The ending port of the allowed traffic range (number, required).
+- protocol: Protocol to allow (e.g., "tcp", "udp") (string, required).
+- cidr_blocks: IPv4 CIDR blocks that traffic can be sent to (optional, list of strings).
+- ipv6_cidr_blocks: IPv6 CIDR blocks that traffic can be sent to (optional, list of strings).
+- prefix_list_ids: AWS-managed prefix list IDs for allowed IP ranges (optional, list of strings).
+- security_groups: List of security group IDs for destination security groups (optional, list of strings).
+- description: Description of the rule (optional, string).
+
+Defaults to an empty list if no inline egress rules are provided.
+EOT
+
   type = list(object({
-    from_port        = number
-    to_port          = number
-    protocol         = string
-    cidr_blocks      = optional(list(string), null)
-    ipv6_cidr_blocks = optional(list(string), null)
-    prefix_list_ids  = optional(list(string), null)
-    security_groups  = optional(list(string), null)
-    description      = optional(string, null)
+    from_port        = number                       # Starting port for allowed traffic
+    to_port          = number                       # Ending port for allowed traffic
+    protocol         = string                       # Protocol (e.g., "tcp" or "udp")
+    cidr_blocks      = optional(list(string), null) # IPv4 CIDR blocks
+    ipv6_cidr_blocks = optional(list(string), null) # IPv6 CIDR blocks
+    prefix_list_ids  = optional(list(string), null) # AWS prefix list IDs for IP ranges
+    security_groups  = optional(list(string), null) # Security group IDs for destination security groups
+    description      = optional(string, null)       # Description of the rule
   }))
+
   default = []
 }
