@@ -92,20 +92,19 @@ variable "delete_timeout" {
 
 variable "advance_ingress_rules" {
   description = <<EOT
-A list of ingress rules that define allowed inbound traffic to the security group. Each rule can specify:
-
-- from_port: Starting port for traffic (number, required)
-- to_port: Ending port for traffic (number, required)
-- ip_protocol: Protocol type (string, required, e.g., "tcp", "udp", "-1" for all)
-- cidr_ipv4: Source IPv4 CIDR block (optional, e.g., "0.0.0.0/0")
-- cidr_ipv6: Source IPv6 CIDR block (optional, e.g., "::/0")
-- description: A description for the rule (optional, string)
-- prefix_list_id: AWS prefix list ID for managed lists (optional, string)
-- referenced_security_group_id: ID of another security group to allow traffic from (optional, string)
-- tags: Key-value map of tags to apply to the rule (optional, map of strings)
-
-Defaults to an empty list if no ingress rules are provided.
-EOT
+    advance_ingress_rules = {
+      A list of ingress rules that define allowed inbound traffic to the security group. Each rule can specify:
+      from_port : "Starting port for traffic (number, required)"
+      to_port : "Protocol type (string, required, e.g., "tcp", "udp", "-1" for all)"
+      ip_protocol : "Organization ID where the service account belongs"
+      cidr_ipv4 : "Source IPv4 CIDR block (optional, e.g., "0.0.0.0/0")"
+      cidr_ipv6 : "Source IPv6 CIDR block (optional, e.g., "::/0")"
+      description : "A description for the rule (optional, string)"
+      prefix_list_id : "AWS prefix list ID for managed lists (optional, string)"
+      referenced_security_group_id : "referenced_security_group_id: ID of another security group to allow traffic from (optional, string)"
+      tags : "Key-value map of tags to apply to the rule (optional, map of strings)"
+    }
+  EOT
 
   type = list(object({
     from_port                    = number                      # Starting port for the rule
