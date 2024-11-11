@@ -24,7 +24,15 @@ run "create_security_group_custom" {
       {
         rule_name   = "http-80-tcp"
         cidr_ipv4   = "0.0.0.0/0"
-        description = "Allow all outbound traffic"
+        description = "Allow all outbound http traffic"
+        tags = {
+          Type = "Egress"
+        }
+      },
+      {
+        rule_name   = "ping-icmp"
+        cidr_ipv4   = "0.0.0.0/0"
+        description = "Allow ICMP traffic for ping"
         tags = {
           Type = "Egress"
         }
