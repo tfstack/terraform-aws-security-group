@@ -18,6 +18,7 @@ locals {
     "jenkins-8080-tcp"       = [8080, 8080, "tcp", "Jenkins CI/CD Server"]
     "kafka-9092-tcp"         = [9092, 9092, "tcp", "Apache Kafka"]
     "kafka-9094-tcp"         = [9094, 9094, "tcp", "Apache Kafka Broker TLS"]
+    "kafka-9098-tcp"         = [9098, 9098, "tcp", "Apache Kafka IAM Authentication"]
     "ldap-389-tcp"           = [389, 389, "tcp", "LDAP Directory"]
     "ldaps-636-tcp"          = [636, 636, "tcp", "Secure LDAP"]
     "memcached-11211-tcp"    = [11211, 11211, "tcp", "Memcached Cache"]
